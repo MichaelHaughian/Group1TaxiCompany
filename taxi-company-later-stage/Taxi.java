@@ -1,5 +1,14 @@
 import java.awt.Image;
+import java.time.DateTimeException;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import javax.naming.directory.InvalidAttributesException;
 import javax.swing.ImageIcon;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.File;
 
 /**
  * A taxi is able to carry a single passenger.
@@ -20,10 +29,11 @@ public class Taxi extends Vehicle implements DrawableItem
      * @param location The vehicle's starting point. Must not be null.
      * @throws NullPointerException If company or location is null.
      */
-    public Taxi(TaxiCompany company, Location location)
+    public Taxi( TaxiCompany company, Location location )
     {
         super(company, location);
-    // Load the two images.
+        // Load the two images.
+        
         emptyImage = new ImageIcon(getClass().getResource(
                                 "images/taxi.jpg")).getImage();
 
@@ -38,21 +48,26 @@ public class Taxi extends Vehicle implements DrawableItem
     public void act()
     {
         Location target = getTargetLocation();
-        if(target != null) {
+        if(target != null)
+        {
             // Find where to move to next.
             Location next = getLocation().nextLocation(target);
             setLocation(next);
-            if(next.equals(target)) {
-                if(passenger != null) {
+            if(next.equals(target))
+            {
+                if( passenger != null )
+                {
                     notifyPassengerArrival(passenger);
                     offloadPassenger();
                 }
-                else {
+                else
+                {
                     notifyPickupArrival();
                 }
             }
         }
-        else {
+        else
+        {
             incrementIdleCount();
         }
     }
@@ -71,9 +86,13 @@ public class Taxi extends Vehicle implements DrawableItem
      * target location.
      * @param location The pickup location.
      */
-    public void setPickupLocation(Location location)
+    public void setPickupLocation( Location location )
     {
-        setTargetLocation(location);
+        if( location == null )
+        {
+            throw new NullPointerException("Invalid location - null");
+        }
+        setTargetLocation( location );
     }
     
     /**
@@ -83,8 +102,16 @@ public class Taxi extends Vehicle implements DrawableItem
      */
     public void pickup(Passenger passenger)
     {
+        if( passenger == null )
+        {
+            throw new NullPointerException("Invalid passenger - null");
+        }
+        
+        pickupTime = new Date();
+        
         this.passenger = passenger;
-        setTargetLocation(passenger.getDestination());
+        
+        setTargetLocation( passenger.getDestination() );
     }
 
     /**
@@ -92,6 +119,32 @@ public class Taxi extends Vehicle implements DrawableItem
      */
     public void offloadPassenger()
     {
+        Date dropOffTime = new Date();
+        
+        if( 0 > dropOffTime.compareTo( pickupTime ) )
+        {
+            throw new DateTimeException("Can't drop passenger off before you've picked them up");
+        }
+         else
+        { 
+            Date journeyDuration =  new Date( dropOffTime.getTime() - pickupTime.getTime() );
+            DateFormat duration = new SimpleDateFormat("ss");
+            String shuttleDuration = "Taxi" + duration.format(journeyDuration);
+            
+            try
+            {
+                FileWriter fileWriter = new FileWriter(new File("C:/CS112GP/DateTime.txt"), true );
+                BufferedWriter writer = new BufferedWriter(fileWriter);
+                writer.write(shuttleDuration + " \n");
+                writer.close();
+            }
+            catch( IOException e )
+            {
+            
+            }
+        }
+        
+        pickupTime = null;
         passenger = null;
         clearTargetLocation();
     }
@@ -102,10 +155,12 @@ public class Taxi extends Vehicle implements DrawableItem
      */
     public Image getImage()
     {
-        if(passenger != null) {
+        if(passenger != null)
+        {
             return passengerImage;
         }
-        else {
+        else
+        {
             return emptyImage;
         }
     }
@@ -116,6 +171,10 @@ public class Taxi extends Vehicle implements DrawableItem
      */
     public String toString()
     {
+        if( getLocation() == null )
+        {
+            throw new NullPointerException( "Invalid Location - null" );
+        }
         return "Taxi at " + getLocation();
     }
 }
