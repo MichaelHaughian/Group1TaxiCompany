@@ -1,5 +1,13 @@
+import java.time.DateTimeException;
+import java.util.Date;
 import java.util.List;
 import java.util.LinkedList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.File;
     
 /**
  * A shuttle is able to carry multiple passengers.
@@ -23,7 +31,8 @@ public class Shuttle extends Vehicle
      */
     public Shuttle(TaxiCompany company, Location location)
     {
-        super(company, location);
+        super( company, location );
+        
         destinations = new LinkedList<>();
         passengers = new LinkedList<>();
     }
@@ -50,7 +59,11 @@ public class Shuttle extends Vehicle
      */
     public void setPickupLocation(Location location)
     {
-        destinations.add(location);
+        if( location == null )
+        {
+            throw new NullPointerException("Invalid Location - null");
+        }
+        destinations.add( location );
         chooseTargetLocation();
     }
     
@@ -59,10 +72,17 @@ public class Shuttle extends Vehicle
      * Add their destination to the list.
      * @param passenger The passenger.
      */
-    public void pickup(Passenger passenger)
+    public void pickup( Passenger passenger )
     {
-        passengers.add(passenger);
-        destinations.add(passenger.getDestination());
+        if( passenger == null )
+        {
+            throw new NullPointerException("Invaild Passenger - null");
+        }
+        
+        pickupTime = new Date();
+        
+        passengers.add( passenger );
+        destinations.add( passenger.getDestination() );
         chooseTargetLocation();
     }
 
@@ -80,5 +100,30 @@ public class Shuttle extends Vehicle
      */
     public void offloadPassenger()
     {
+        Date dropOffTime = new Date();
+        
+        if( 0 > dropOffTime.compareTo( pickupTime ) )
+        {
+            throw new DateTimeException("Drop off time can't be before pick up time");
+        }
+        else
+        { 
+            Date journeyDuration =  new Date( dropOffTime.getTime() - pickupTime.getTime() );
+            DateFormat duration = new SimpleDateFormat("ss");
+            String shuttleDuration = "Shuttle" + duration.format(journeyDuration);
+            
+            try
+            {
+                FileWriter fileWriter = new FileWriter(new File("C:/CS112GP/DateTime.txt"), true);
+                BufferedWriter writer = new BufferedWriter(fileWriter);
+                writer.write(shuttleDuration + " \n");
+                writer.close();
+            }
+            catch( IOException e )
+            {
+            
+            }
+        }
+        pickupTime = null;
     }
 }

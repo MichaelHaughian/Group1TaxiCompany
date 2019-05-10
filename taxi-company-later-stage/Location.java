@@ -1,3 +1,5 @@
+import java.security.InvalidParameterException;
+
 /**
  * Model a location in a city.
  * 
@@ -17,11 +19,13 @@ public class Location
      */
     public Location(int x, int y)
     {
-        if(x < 0) {
+        if(x < 0)
+        {
             throw new IllegalArgumentException(
                         "Negative x-coordinate: " + x);
         }
-        if(y < 0) {
+        if(y < 0)
+        {
             throw new IllegalArgumentException(
                         "Negative y-coordinate: " + y);
         }
@@ -38,11 +42,17 @@ public class Location
      */
     public Location nextLocation(Location destination)
     {
+        if( destination == null )
+        {
+            throw new NullPointerException("Invalid destination - null");
+        }
+        
         int destX = destination.getX();
         int destY = destination.getY();
         int offsetX = x < destX ? 1 : x > destX ? -1 : 0;
         int offsetY = y < destY ? 1 : y > destY ? -1 : 0;
-        if(offsetX != 0 || offsetY != 0) {
+        if(offsetX != 0 || offsetY != 0)
+        {
             return new Location(x + offsetX, y + offsetY);
         }
         else {
@@ -58,6 +68,11 @@ public class Location
      */
     public int distance(Location destination)
     {
+        if( destination == null )
+        {
+            throw new NullPointerException("Invalid destination - null");
+        }
+        
         int xDist = Math.abs(destination.getX() - x);
         int yDist = Math.abs(destination.getY() - y);
         return Math.max(xDist, yDist);
@@ -70,12 +85,18 @@ public class Location
      */
     public boolean equals(Object other)
     {
-        if(other instanceof Location) {
+        if( other == null )
+        {
+            throw new NullPointerException("Invalid Object - null");
+        }
+        if(other instanceof Location)
+        {
             Location otherLocation = (Location) other;
             return x == otherLocation.getX() &&
                    y == otherLocation.getY();
         }
-        else {
+        else
+        {
             return false;
         }
     }

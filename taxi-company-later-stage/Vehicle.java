@@ -1,3 +1,6 @@
+import java.util.Date;
+import java.util.ArrayList;
+
 /**
  * Model the common elements of taxis and shuttles.
  * 
@@ -13,6 +16,10 @@ public abstract class Vehicle implements Actor
     private Location targetLocation;
     // Record how often the vehicle has nothing to do.
     private int idleCount;
+    // Record the time the vehicle picks up its current passenger
+    protected Date pickupTime;
+    // Record the duration of each journey
+    protected Date journeyDurations;
     
     /**
      * Constructor of class Vehicle
@@ -22,10 +29,12 @@ public abstract class Vehicle implements Actor
      */
     public Vehicle(TaxiCompany company, Location location)
     {
-        if(company == null) {
+        if(company == null)
+        {
             throw new NullPointerException("company");
         }
-        if(location == null) {
+        if(location == null)
+        {
             throw new NullPointerException("location");
         }
         this.company = company;
@@ -48,6 +57,10 @@ public abstract class Vehicle implements Actor
      */
     public void notifyPassengerArrival(Passenger passenger)
     {
+        if( passenger == null )
+        {
+            throw new NullPointerException("Invalid Passenger");
+        }
         company.arrivedAtDestination(this, passenger);
     }
     
@@ -56,14 +69,14 @@ public abstract class Vehicle implements Actor
      * How this is handled depends on the type of vehicle.
      * @param location The pickup location.
      */
-    public abstract void setPickupLocation(Location location);
+    public abstract void setPickupLocation( Location location );
     
     /**
      * Receive a passenger.
      * How this is handled depends on the type of vehicle.
      * @param passenger The passenger.
      */
-    public abstract void pickup(Passenger passenger);
+    public abstract void pickup( Passenger passenger );
     
     /**
      * Is the vehicle free?
@@ -82,6 +95,10 @@ public abstract class Vehicle implements Actor
      */
     public Location getLocation()
     {
+        if( location == null )
+        {
+            throw new NullPointerException("Invalid Location - null");
+        }
         return location;
     }
     
@@ -92,11 +109,13 @@ public abstract class Vehicle implements Actor
      */
     public void setLocation(Location location)
     {
-        if(location != null) {
+        if(location != null)
+        {
             this.location = location;
         }
-        else {
-            throw new NullPointerException();
+        else
+        {
+            throw new NullPointerException("Invalid Location");
         }
     }
     
@@ -117,11 +136,13 @@ public abstract class Vehicle implements Actor
      */
     public void setTargetLocation(Location location)
     {
-        if(location != null) {
+        if(location != null)
+        {
             targetLocation = location;
         }
-        else {
-            throw new NullPointerException();
+        else
+        {
+            throw new NullPointerException("Invalid Location");
         }
     }
     

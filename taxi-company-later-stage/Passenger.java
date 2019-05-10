@@ -1,4 +1,5 @@
 import java.awt.Image;
+import java.security.InvalidParameterException;
 import javax.swing.ImageIcon;
 
 /**
@@ -22,17 +23,24 @@ public class Passenger implements DrawableItem
      */
     public Passenger(Location pickup, Location destination)
     {
-        if(pickup == null) {
+        if( pickup.equals( destination ) )
+        {
+            throw new InvalidParameterException("Destination and Pickup can't be same");
+        }
+        if(pickup == null)
+        {
             throw new NullPointerException("Pickup location");
         }
-        if(destination == null) {
+        if(destination == null)
+        {
             throw new NullPointerException("Destination location");
         }
+        
         this.pickup = pickup;
         this.destination = destination;
         // Load the image used to represent a person.
-        image = new ImageIcon(getClass().getResource(
-                              "images/person.jpg")).getImage();
+        image = new ImageIcon( getClass().getResource(
+                              "images/person.jpg") ).getImage();
     }
     
     /**
